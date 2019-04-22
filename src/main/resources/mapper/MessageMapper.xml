@@ -130,7 +130,7 @@
     select
     <include refid="WithUser_Column_List"/>
     from chat_message
-    left join chat_user on chat_message.'m_id'=chat_user.'u_id'
+    LEFT JOIN chat_user ON chat_message.m_id=chat_user.u_id
     where pk = #{pk,jdbcType=INTEGER}
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
