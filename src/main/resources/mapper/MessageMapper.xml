@@ -79,7 +79,7 @@
     pk, m_word, m_id, mtime
   </sql>
   <sql id="WithUser_Column_List">
-    chat_message.pk, chat_message.m_word, chat_message.m_id, chat_message.m_time,chat_user.u_id,chat_user.u_nickname
+    pk, m_word, m_id,u_id,u_nickname
   </sql>
   <select id="selectByExample" parameterType="xyz.chanjiji.ChatRoom.bean.MessageExample" resultMap="BaseResultMap">
     select
@@ -96,6 +96,21 @@
     </if>
   </select>
   <!--查询信息同时查询用户信息-->
+  <!--<select id="selectByExampleWithUser" resultMap="WithUserResultMap">-->
+    <!--select-->
+    <!--<if test="distinct">-->
+      <!--distinct-->
+    <!--</if>-->
+    <!--<include refid="WithUser_Column_List"/>-->
+    <!--from chat_user,chat_message-->
+    <!--where chat_user.u_id=chat_message.m_id-->
+    <!--<if test="_parameter != null">-->
+      <!--<include refid="Example_Where_Clause"/>-->
+    <!--</if>-->
+    <!--<if test="orderByClause != null">-->
+      <!--order by ${orderByClause}-->
+    <!--</if>-->
+  <!--</select>-->
   <select id="selectByExampleWithUser" resultMap="WithUserResultMap">
     select
     <if test="distinct">
@@ -103,7 +118,7 @@
     </if>
     <include refid="WithUser_Column_List"/>
     from chat_message
-    left join user on chat_message.'m_id' = chat_user.'u_id'
+    LEFT JOIN chat_user ON chat_message.m_id=chat_user.u_id
     <if test="_parameter != null">
       <include refid="Example_Where_Clause"/>
     </if>

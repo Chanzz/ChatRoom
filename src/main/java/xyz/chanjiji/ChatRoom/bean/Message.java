@@ -52,4 +52,15 @@ public class Message {
     public void setMtime(Date mtime) {
         this.mtime = mtime;
     }
+
+    public Message() {
+    }
+
+    public Message(Integer pk, String mWord, Integer mId, Date mtime) {
+        this.pk = pk;
+        this.mWord = mWord;
+        this.mId = mId;
+        this.mtime = mtime;
+    }
+
 }
