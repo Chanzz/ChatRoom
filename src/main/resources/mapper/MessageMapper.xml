@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.chanjiji.ChatRoom.dao.MessageMapper">
+  <resultMap id="BaseResultMap" type="xyz.chanjiji.ChatRoom.bean.Message">
+    <id column="pk" jdbcType="INTEGER" property="pk" />
+    <result column="m_word" jdbcType="VARCHAR" property="mWord" />
+    <result column="m_id" jdbcType="INTEGER" property="mId" />
+    <result column="mtime" jdbcType="TIMESTAMP" property="mtime" />
+  </resultMap>
+  <resultMap id="WithUserResultMap" type="xyz.chanjiji.ChatRoom.bean.Message">
+    <id column="pk" jdbcType="INTEGER" property="pk" />
+    <result column="m_word" jdbcType="VARCHAR" property="mWord" />
+    <result column="m_id" jdbcType="INTEGER" property="mId" />
+    <result column="mtime" jdbcType="TIMESTAMP" property="mtime" />
+    <association property="user" javaType="xyz.chanjiji.ChatRoom.bean.User">
+      <id column="u_id" property="uId"/>
+      <result column="u_nickname" property="uNickname"/>
+    </association>
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    pk, m_word, m_id, mtime
+  </sql>
+  <sql id="WithUser_Column_List">
+    chat_message.pk, chat_message.m_word, chat_message.m_id, chat_message.m_time,chat_user.u_id,chat_user.u_nickname
+  </sql>
+  <select id="selectByExample" parameterType="xyz.chanjiji.ChatRoom.bean.MessageExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from chat_message
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <!--查询信息同时查询用户信息-->
+  <select id="selectByExampleWithUser" resultMap="WithUserResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="WithUser_Column_List"/>
+    from chat_message
+    left join user on chat_message.'m_id' = chat_user.'u_id'
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause"/>
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKeyWithUser" resultMap="WithUserResultMap">
+    select
+    <include refid="WithUser_Column_List"/>
+    from chat_message
+    left join chat_user on chat_message.'m_id'=chat_user.'u_id'
+    where pk = #{pk,jdbcType=INTEGER}
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from chat_message
+    where pk = #{pk,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from chat_message
+    where pk = #{pk,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="xyz.chanjiji.ChatRoom.bean.MessageExample">
+    delete from chat_message
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="xyz.chanjiji.ChatRoom.bean.Message">
+    insert into chat_message (pk, m_word, m_id, 
+      mtime)
+    values (#{pk,jdbcType=INTEGER}, #{mWord,jdbcType=VARCHAR}, #{mId,jdbcType=INTEGER}, 
+      #{mtime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="xyz.chanjiji.ChatRoom.bean.Message">
+    insert into chat_message
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="pk != null">
+        pk,
+      </if>
+      <if test="mWord != null">
+        m_word,
+      </if>
+      <if test="mId != null">
+        m_id,
+      </if>
+      <if test="mtime != null">
+        mtime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="pk != null">
+        #{pk,jdbcType=INTEGER},
+      </if>
+      <if test="mWord != null">
+        #{mWord,jdbcType=VARCHAR},
+      </if>
+      <if test="mId != null">
+        #{mId,jdbcType=INTEGER},
+      </if>
+      <if test="mtime != null">
+        #{mtime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="xyz.chanjiji.ChatRoom.bean.MessageExample" resultType="java.lang.Long">
+    select count(*) from chat_message
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update chat_message
+    <set>
+      <if test="record.pk != null">
+        pk = #{record.pk,jdbcType=INTEGER},
+      </if>
+      <if test="record.mWord != null">
+        m_word = #{record.mWord,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mId != null">
+        m_id = #{record.mId,jdbcType=INTEGER},
+      </if>
+      <if test="record.mtime != null">
+        mtime = #{record.mtime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update chat_message
+    set pk = #{record.pk,jdbcType=INTEGER},
+      m_word = #{record.mWord,jdbcType=VARCHAR},
+      m_id = #{record.mId,jdbcType=INTEGER},
+      mtime = #{record.mtime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="xyz.chanjiji.ChatRoom.bean.Message">
+    update chat_message
+    <set>
+      <if test="mWord != null">
+        m_word = #{mWord,jdbcType=VARCHAR},
+      </if>
+      <if test="mId != null">
+        m_id = #{mId,jdbcType=INTEGER},
+      </if>
+      <if test="mtime != null">
+        mtime = #{mtime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where pk = #{pk,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="xyz.chanjiji.ChatRoom.bean.Message">
+    update chat_message
+    set m_word = #{mWord,jdbcType=VARCHAR},
+      m_id = #{mId,jdbcType=INTEGER},
+      mtime = #{mtime,jdbcType=TIMESTAMP}
+    where pk = #{pk,jdbcType=INTEGER}
+  </update>
+</mapper>
